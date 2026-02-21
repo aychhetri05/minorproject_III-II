@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createItem } from '../services/api';
+import SubmitToPoliceButton from '../components/SubmitToPoliceButton';
 
 const ReportItem = () => {
     const navigate = useNavigate();
@@ -17,6 +18,8 @@ const ReportItem = () => {
     const [error, setError]   = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const [newFoundId, setNewFoundId] = useState(null);
+    const [showSubmissionModal, setShowSubmissionModal] = useState(false);
 
     const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -41,7 +44,16 @@ const ReportItem = () => {
         try {
             const res = await createItem(formData);
             setSuccess(`✅ Item reported! ${res.data.message}`);
-            setTimeout(() => navigate('/profile'), 2500);
+
+            // If this was a FOUND report, immediately show the "Submit to Police" UI
+            if (form.type === 'found') {
+                const itemId = res.data.itemId;
+                setNewFoundId(itemId);
+                setShowSubmissionModal(true);
+                // do not navigate away; let user submit to police from modal
+            } else {
+                setTimeout(() => navigate('/profile'), 2500);
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to submit report.');
         } finally {
@@ -175,6 +187,25 @@ const ReportItem = () => {
                     </form>
                 </div>
             </div>
+
+            {/* Automatically trigger SubmitToPolice modal for new found items */}
+            {newFoundId && (
+                <SubmitToPoliceButton
+                    itemId={newFoundId}
+                    autoOpen={showSubmissionModal}
+                    onSubmitted={() => {
+                        setSuccess('✅ Submission to police created.');
+                        setShowSubmissionModal(false);
+                        setNewFoundId(null);
+                        navigate('/profile');
+                    }}
+                    onClose={() => {
+                        setShowSubmissionModal(false);
+                        setNewFoundId(null);
+                        navigate('/profile');
+                    }}
+                />
+            )}
 
             <div className="alert alert-info mt-3">
                 <strong>🤖 AI Matching:</strong> Once submitted, our system will automatically compare your

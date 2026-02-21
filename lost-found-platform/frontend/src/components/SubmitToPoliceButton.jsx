@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { submitPhysical } from '../services/api';
 
-const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus }) => {
+const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus, autoOpen = false, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -25,6 +25,7 @@ const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus }) => {
             await submitPhysical(itemId, formData);
             alert('✅ Submission created! Your item is now pending police verification.');
             setShowModal(false);
+            if (onClose) onClose();
             setFormData({ police_station: '', location_details: '' });
             if (onSubmitted) onSubmitted();
         } catch (err) {
@@ -34,6 +35,10 @@ const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus }) => {
     };
 
     const isDisabled = loading || (itemStatus && !['reported', 'pending_physical'].includes(itemStatus));
+
+    useEffect(() => {
+        if (autoOpen) setShowModal(true);
+    }, [autoOpen]);
 
     return (
         <>
@@ -56,7 +61,10 @@ const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus }) => {
                                 <button 
                                     type="button" 
                                     className="btn-close" 
-                                    onClick={() => setShowModal(false)}
+                                    onClick={() => {
+                                        setShowModal(false);
+                                        if (onClose) onClose();
+                                    }}
                                     disabled={loading}
                                 />
                             </div>
@@ -119,7 +127,10 @@ const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus }) => {
                                     <button 
                                         type="button" 
                                         className="btn btn-secondary" 
-                                        onClick={() => setShowModal(false)}
+                                        onClick={() => {
+                                            setShowModal(false);
+                                            if (onClose) onClose();
+                                        }}
                                         disabled={loading}
                                     >
                                         Cancel

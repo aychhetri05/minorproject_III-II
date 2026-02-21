@@ -15,6 +15,7 @@ import ViewItems   from './pages/ViewItems';
 import ItemDetail  from './pages/ItemDetail';
 import AdminPanel  from './pages/AdminPanel';
 import UserProfile from './pages/UserProfile';
+import SubmitToPolice from './pages/SubmitToPolice';
 
 function App() {
     return (
@@ -38,6 +39,9 @@ function App() {
                     } />
                     <Route path="/profile" element={
                         <ProtectedRoute><UserProfile /></ProtectedRoute>
+                    } />
+                    <Route path="/submit-to-police/:id" element={
+                        <ProtectedRoute><SubmitToPolice /></ProtectedRoute>
                     } />
 
                     {/* Admin only */}
