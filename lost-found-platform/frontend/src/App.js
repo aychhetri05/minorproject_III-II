@@ -9,6 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home        from './pages/Home';
 import Register    from './pages/Register';
 import Login       from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard   from './pages/Dashboard';
 import ReportItem  from './pages/ReportItem';
 import ViewItems   from './pages/ViewItems';
@@ -27,6 +29,8 @@ function App() {
                     <Route path="/"         element={<Home />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/login"    element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password/:token" element={<ResetPassword />} />
                     <Route path="/items"    element={<ViewItems />} />
                     <Route path="/items/:id" element={<ItemDetail />} />
 

@@ -42,7 +42,7 @@ const Login = () => {
                     <div className="card-body p-4">
                         <div className="text-center mb-4">
                             <h2 className="fw-bold text-primary">🔐 Login</h2>
-                            <p className="text-muted">🇳🇵 Nepal Lost & Found Platform</p>
+                            <p className="text-muted">Nepal Lost & Found Platform</p>
                         </div>
                         {successMsg && <div className="alert alert-success py-2">{successMsg}</div>}
                         {error && <div className="alert alert-danger py-2">{error}</div>}
@@ -60,7 +60,10 @@ const Login = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="form-label fw-semibold">Password</label>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <label className="form-label fw-semibold">Password</label>
+                                    <Link to="/forgot-password" className="text-decoration-none small">Forgot Password?</Link>
+                                </div>
                                 <input
                                     type="password"
                                     name="password"
