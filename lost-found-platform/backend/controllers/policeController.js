@@ -9,7 +9,7 @@ const getItems = async (req, res) => {
     const { type, status, location, startDate, endDate } = req.query;
 
     try {
-        let sql = `SELECT i.*, u.name AS reporter_name, u.email AS reporter_email,
+        let sql = `SELECT i.*, u.name AS reporter_name, u.email AS reporter_email, u.phone AS reporter_phone,
                           pu.name AS verifier_name,
                           m.id AS match_id, m.similarity_score, m.verification_status
                    FROM items i
@@ -227,7 +227,7 @@ const verifyPhysical = async (req, res) => {
 const getPendingPhysical = async (req, res) => {
     try {
         const [rows] = await db.query(
-            `SELECT i.*, u.name AS reporter_name, u.email AS reporter_email,
+            `SELECT i.*, u.name AS reporter_name, u.email AS reporter_email, u.phone AS reporter_phone,
                     pu.name AS verifier_name
              FROM items i
              JOIN users u ON i.user_id = u.id
@@ -268,7 +268,7 @@ const markClosed = async (req, res) => {
 const getSubmissions = async (req, res) => {
     try {
         const [rows] = await db.query(
-            `SELECT s.*, i.title AS item_title, u.name AS found_user_name, u.email AS found_user_email
+            `SELECT s.*, i.title AS item_title, u.name AS found_user_name, u.email AS found_user_email, u.phone AS found_user_phone
              FROM submissions s
              JOIN items i ON s.item_id = i.id
              JOIN users u ON s.found_user_id = u.id
@@ -308,11 +308,11 @@ const acceptSubmission = async (req, res) => {
 
         // notify found user and item reporter
         const msgFound = `Your physical submission for item #${sub.item_id} was accepted by police.`;
-        await createNotification(sub.found_user_id, msgFound);
+        await createNotification(sub.found_user_id, msgFound, 'police_action');
 
         const [[itemRow]] = await db.query('SELECT user_id FROM items WHERE id = ?', [sub.item_id]);
         if (itemRow && itemRow.user_id) {
-            await createNotification(itemRow.user_id, `Item #${sub.item_id} has been physically verified by police.`);
+            await createNotification(itemRow.user_id, `Item #${sub.item_id} has been physically verified by police.`, 'police_action');
         }
 
         res.json({ message: 'Submission accepted and item physically verified.' });
@@ -343,7 +343,7 @@ const rejectSubmission = async (req, res) => {
         await db.query('INSERT INTO police_actions (police_id, action_type, item_id, notes) VALUES (?, ?, ?, ?)', [policeId, 'reject_submission', sub.item_id, notes || null]);
 
         // notify found user
-        await createNotification(sub.found_user_id, `Your physical submission for item #${sub.item_id} was rejected by police. Notes: ${notes || ''}`);
+        await createNotification(sub.found_user_id, `Your physical submission for item #${sub.item_id} was rejected by police. Notes: ${notes || ''}`, 'police_action');
 
         res.json({ message: 'Submission rejected.' });
     } catch (err) {

@@ -10,6 +10,7 @@
 
 const natural = require('natural');
 const db = require('../config/db');
+const { createNotification } = require('./notificationService');
 require('dotenv').config();
 
 const tokenizer  = new natural.WordTokenizer();
@@ -77,10 +78,10 @@ async function runMatching(newItem) {
     try {
         const oppositeType = newItem.type === 'lost' ? 'found' : 'lost';
 
-        // Fetch all open items of the opposite type
+        // Fetch all available items of the opposite type (allow both 'open' and legacy 'reported')
         const [candidates] = await db.query(
             `SELECT id, title, description FROM items 
-             WHERE type = ? AND status = 'open' AND id != ?`,
+             WHERE type = ? AND status IN ('open', 'reported') AND id != ?`,
             [oppositeType, newItem.id]
         );
 
@@ -134,6 +135,31 @@ async function runMatching(newItem) {
                 `UPDATE items SET status = 'matched' WHERE id IN (?, ?)`,
                 [newItem.id, bestMatch.id]
             );
+
+            // ============================================================
+            // NOTIFICATION TRIGGER: Notify the lost item owner about the match
+            // ============================================================
+            try {
+                // Get the lost item details and owner
+                const [lostItemRows] = await db.query(
+                    `SELECT i.*, u.name as owner_name FROM items i
+                     JOIN users u ON i.user_id = u.id
+                     WHERE i.id = ?`,
+                    [lostItemId]
+                );
+
+                if (lostItemRows.length > 0) {
+                    const lostItem = lostItemRows[0];
+                    const matchMessage = `A possible match has been found for your lost item "${lostItem.title}". Please check your dashboard for details. Match confidence: ${(bestScore * 100).toFixed(1)}%`;
+
+                    // Create notification for the lost item owner
+                    await createNotification(lostItem.user_id, matchMessage, 'match');
+
+                    console.log(`[Matching] 📢 Notification sent to user ${lostItem.owner_name} (ID: ${lostItem.user_id})`);
+                }
+            } catch (notifyErr) {
+                console.error('[Matching] Error sending notification:', notifyErr.message);
+            }
 
             console.log(`[Matching] Items #${newItem.id} and #${bestMatch.id} marked as 'matched'.`);
         } else {

@@ -16,7 +16,9 @@ const ForgotPassword = () => {
         setLoading(true);
 
         try {
+            console.log('Sending forgot password request for:', email); // DEBUG
             const res = await forgotPassword({ email });
+            console.log('Forgot password response:', res.data); // DEBUG
             setSuccess(res.data.message || 'If an account with this email exists, you will receive a reset link.');
             setEmail('');
 
@@ -25,9 +27,12 @@ const ForgotPassword = () => {
                 console.log('Dev Mode - Reset Link:', res.data.resetLink);
             }
         } catch (err) {
+            console.error('Forgot password error:', err); // DEBUG: Log full error
             const serverMsg = err.response?.data?.message;
             const status = err.response?.status;
-            setError(serverMsg || (status ? `Request failed (${status})` : err.message) || 'Failed to send reset link.');
+            const errorMsg = serverMsg || (status ? `Request failed (${status})` : err.message) || 'Failed to send reset link.';
+            console.error('Error message to display:', errorMsg); // DEBUG
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }

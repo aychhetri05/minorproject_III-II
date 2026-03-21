@@ -3,7 +3,7 @@ const express  = require('express');
 const router   = express.Router();
 const multer   = require('multer');
 const path     = require('path');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminMiddleware, policeOrAdminMiddleware } = require('../middleware/auth');
 const {
     createItem,
     getAllItems,
@@ -49,9 +49,9 @@ router.post('/', authMiddleware, upload.single('image'), createItem); // POST /a
 // Submit found item physically to police (authenticated found user)
 router.post('/:id/submit-physical', authMiddleware, submitPhysical);
 
-// ---- Admin-only routes ----
+// ---- Admin / Police routes ----
 router.get('/admin/matches',          authMiddleware, adminMiddleware, getAllMatches);
 router.get('/admin/stats',            authMiddleware, adminMiddleware, getStats);
-router.patch('/:id/status',           authMiddleware, adminMiddleware, updateItemStatus);
+router.patch('/:id/status',           authMiddleware, policeOrAdminMiddleware, updateItemStatus);
 
 module.exports = router;

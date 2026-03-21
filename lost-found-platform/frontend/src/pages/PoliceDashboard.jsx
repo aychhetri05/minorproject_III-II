@@ -205,7 +205,8 @@ const PoliceDashboard = () => {
                                                     </div>
                                                     <div className="col-6">
                                                         <strong>Contact:</strong><br/>
-                                                        <small>{s.found_user_email}</small>
+                                                        <small>{s.found_user_email}</small><br/>
+                                                        {s.found_user_phone && <small>📞 {s.found_user_phone}</small>}
                                                     </div>
                                                     <div className="col-6">
                                                         <strong>Police Station:</strong><br/>

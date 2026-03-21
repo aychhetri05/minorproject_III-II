@@ -3,6 +3,7 @@
 
 const db = require('../config/db');
 const { runMatching } = require('../services/matchingService');
+const { getPoliceStationDetails } = require('../services/reminderService');
 
 /**
  * POST /api/items
@@ -88,7 +89,7 @@ const submitPhysical = async (req, res) => {
 const getAllItems = async (req, res) => {
     try {
         const [items] = await db.query(
-            `SELECT i.*, u.name AS reporter_name, u.email AS reporter_email, v.name AS verifier_name
+            `SELECT i.*, u.name AS reporter_name, u.email AS reporter_email, u.phone AS reporter_phone, v.name AS verifier_name
              FROM items i
              JOIN users u ON i.user_id = u.id
              LEFT JOIN users v ON i.verified_by = v.id
@@ -108,11 +109,11 @@ const getAllItems = async (req, res) => {
 const getOpenItems = async (req, res) => {
     try {
         const [items] = await db.query(
-            `SELECT i.*, u.name AS reporter_name, v.name AS verifier_name
+            `SELECT i.*, u.name AS reporter_name, u.phone AS reporter_phone, v.name AS verifier_name
              FROM items i
              JOIN users u ON i.user_id = u.id
              LEFT JOIN users v ON i.verified_by = v.id
-             WHERE i.status = 'open'
+             WHERE i.status IN ('open', 'reported')
              ORDER BY i.created_at DESC`
         );
         res.json(items);
@@ -146,7 +147,7 @@ const getItemById = async (req, res) => {
 
         // Fetch match info if this item was matched
         const [matches] = await db.query(
-            `SELECT m.*, 
+            `SELECT m.*,
                     li.title AS lost_title, li.description AS lost_desc,
                     fi.title AS found_title, fi.description AS found_desc
              FROM matches m
@@ -156,7 +157,32 @@ const getItemById = async (req, res) => {
             [id, id]
         );
 
-        res.json({ ...item, match: matches[0] || null });
+        let policeStationDetails = null;
+
+        // If there's a match and this is the lost item, check if found item was submitted to police
+        if (matches.length > 0 && item.type === 'lost') {
+            const match = matches[0];
+            const foundItemId = match.found_item_id;
+
+            // Check if found item has been submitted to police
+            const [submissions] = await db.query(
+                `SELECT s.id, s.police_station, s.status
+                 FROM submissions s
+                 WHERE s.item_id = ? AND s.status IN ('accepted', 'pending')`,
+                [foundItemId]
+            );
+
+            if (submissions.length > 0) {
+                const submission = submissions[0];
+                policeStationDetails = await getPoliceStationDetails(submission.id);
+            }
+        }
+
+        res.json({
+            ...item,
+            match: matches[0] || null,
+            police_station: policeStationDetails
+        });
     } catch (err) {
         console.error('[GetItemById]', err.message);
         res.status(500).json({ message: 'Server error.' });
@@ -201,7 +227,15 @@ const updateItemStatus = async (req, res) => {
     }
 
     try {
-        await db.query('UPDATE items SET status = ? WHERE id = ?', [status, id]);
+        if (status === 'physically_verified') {
+            await db.query(
+                `UPDATE items SET status = ?, physically_verified = TRUE, verification_type = 'Physical', verification_timestamp = NOW(), verified_by = ? WHERE id = ?`,
+                [status, req.user.id, id]
+            );
+        } else {
+            await db.query('UPDATE items SET status = ? WHERE id = ?', [status, id]);
+        }
+
         res.json({ message: `Item #${id} status updated to '${status}'.` });
     } catch (err) {
         console.error('[UpdateStatus]', err.message);
@@ -219,12 +253,15 @@ const getStats = async (req, res) => {
         const [[{ lost }]]    = await db.query('SELECT COUNT(*) AS lost FROM items WHERE type="lost"');
         const [[{ found }]]   = await db.query('SELECT COUNT(*) AS found FROM items WHERE type="found"');
         const [[{ open }]]    = await db.query('SELECT COUNT(*) AS open FROM items WHERE status="open"');
+        const [[{ reported }]] = await db.query('SELECT COUNT(*) AS reported FROM items WHERE status="reported"');
+        const [[{ pending_physical }]] = await db.query('SELECT COUNT(*) AS pending_physical FROM items WHERE status="pending_physical"');
+        const [[{ physically_verified }]] = await db.query('SELECT COUNT(*) AS physically_verified FROM items WHERE status="physically_verified"');
         const [[{ matched }]] = await db.query('SELECT COUNT(*) AS matched FROM items WHERE status="matched"');
         const [[{ resolved }]]= await db.query('SELECT COUNT(*) AS resolved FROM items WHERE status="resolved"');
         const [[{ users }]]   = await db.query('SELECT COUNT(*) AS users FROM users');
         const [[{ totalMatches }]] = await db.query('SELECT COUNT(*) AS totalMatches FROM matches');
 
-        res.json({ total, lost, found, open, matched, resolved, users, totalMatches });
+        res.json({ total, lost, found, open, reported, pending_physical, physically_verified, matched, resolved, users, totalMatches });
     } catch (err) {
         console.error('[GetStats]', err.message);
         res.status(500).json({ message: 'Server error.' });

@@ -18,6 +18,7 @@ import ItemDetail  from './pages/ItemDetail';
 import AdminPanel  from './pages/AdminPanel';
 import UserProfile from './pages/UserProfile';
 import SubmitToPolice from './pages/SubmitToPolice';
+import Notifications from './components/Notifications';
 
 function App() {
     return (
@@ -43,6 +44,9 @@ function App() {
                     } />
                     <Route path="/profile" element={
                         <ProtectedRoute><UserProfile /></ProtectedRoute>
+                    } />
+                    <Route path="/notifications" element={
+                        <ProtectedRoute><Notifications /></ProtectedRoute>
                     } />
                     <Route path="/submit-to-police/:id" element={
                         <ProtectedRoute><SubmitToPolice /></ProtectedRoute>

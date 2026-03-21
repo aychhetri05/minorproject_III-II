@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(150) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,          -- bcrypt hashed
     role ENUM('user', 'admin', 'police') DEFAULT 'user',
+    phone VARCHAR(20) DEFAULT NULL,
+    profile_picture_path VARCHAR(500) DEFAULT NULL,
+    verified_document_path VARCHAR(500) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

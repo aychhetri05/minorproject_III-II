@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getItemById } from '../services/api';
 import SubmitToPoliceButton from '../components/SubmitToPoliceButton';
 import VerificationBadge from '../components/VerificationBadge';
+import PoliceStationInfo from '../components/PoliceStationInfo';
 
 const STATUS_COLORS = { open: 'success', reported: 'info', matched: 'warning', verified: 'primary', pending_physical: 'warning', physically_verified: 'success', resolved: 'secondary' };
 const STATUS_ICONS = { open: '🔄', reported: '📝', matched: '🔗', verified: '✅', pending_physical: '⏳', physically_verified: '🚔', resolved: '🎉' };
@@ -116,6 +117,11 @@ const ItemDetail = () => {
                                 Please contact the reporter to verify and resolve this case.
                             </p>
                         </div>
+                    )}
+
+                    {/* Police Station Information */}
+                    {item.police_station && (
+                        <PoliceStationInfo policeStation={item.police_station} />
                     )}
 
                     {/* Physical submission / verification UI */}

@@ -26,7 +26,7 @@ const createPoliceUser = async (req, res) => {
         const [result] = await db.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [name, email, hashed, 'police']);
 
         // Notify the newly created police account (DB + optional email)
-        try { await createNotification(result.insertId, `Your police account has been created. Login email: ${email}`); } catch (e) { console.error(e.message); }
+        try { await createNotification(result.insertId, `Your police account has been created. Login email: ${email}`, 'system'); } catch (e) { console.error(e.message); }
 
         res.status(201).json({ message: 'Police account created.', userId: result.insertId, tempPassword: password ? undefined : plain });
     } catch (err) {

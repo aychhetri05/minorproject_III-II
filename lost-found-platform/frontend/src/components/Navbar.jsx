@@ -1,5 +1,6 @@
 // src/components/Navbar.jsx
 import { Link, useNavigate } from 'react-router-dom';
+import Notifications from './Notifications';
 
 const Navbar = () => {
     const navigate  = useNavigate();
@@ -46,15 +47,22 @@ const Navbar = () => {
                     </ul>
                     <ul className="navbar-nav">
                         {isLoggedIn ? (
-                            <li className="nav-item dropdown">
-                                <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
-                                    👤 {user.name}
-                                    {user.role === 'admin' && <span className="badge bg-warning text-dark ms-1">Admin</span>}
-                                </span>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                    <li><button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button></li>
-                                </ul>
-                            </li>
+                            <>
+                                <li className="nav-item me-2">
+                                    <Notifications isDropdown={true} />
+                                </li>
+                                <li className="nav-item dropdown">
+                                    <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
+                                        👤 {user.name}
+                                        {user.role === 'admin' && <span className="badge bg-warning text-dark ms-1">Admin</span>}
+                                    </span>
+                                    <ul className="dropdown-menu dropdown-menu-end">
+                                        <li><Link className="dropdown-item" to="/notifications">View All Notifications</Link></li>
+                                        <li><hr className="dropdown-divider" /></li>
+                                        <li><button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button></li>
+                                    </ul>
+                                </li>
+                            </>
                         ) : (
                             <>
                                 <li className="nav-item"><Link className="nav-link" to="/login">Login</Link></li>

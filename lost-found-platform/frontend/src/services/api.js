@@ -36,8 +36,8 @@ api.interceptors.response.use(
 // ---- Auth ----
 export const registerUser = (data)  => api.post('/register', data);
 export const loginUser    = (data)  => api.post('/login', data);
-export const forgotPassword = (data) => api.post('/auth/forgot-password', data);
-export const resetPassword = (token, data) => api.post(`/auth/reset-password/${token}`, data);
+export const forgotPassword = (data) => api.post('/forgot-password', data);
+export const resetPassword = (token, data) => api.post(`/reset-password/${token}`, data);
 
 // ---- Items ----
 export const getAllItems   = ()      => api.get('/items');
@@ -67,6 +67,10 @@ export const rejectSubmission = (id, data) => api.post(`/police/submissions/${id
 
 // ---- Admin ----
 export const createPoliceUser = (data) => api.post('/admin/create-police', data);
+
+// ---- Users ----
+export const getProfile    = ()      => api.get('/users/profile');
+export const updateProfile = (data)  => api.put('/users/profile', data); // FormData for image upload
 
 // ---- Notifications ----
 export const getNotifications = () => api.get('/notifications');

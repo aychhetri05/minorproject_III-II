@@ -94,15 +94,18 @@ const login = async (req, res) => {
 };
 
 /**
- * POST /api/auth/forgot-password
+ * POST /api/forgot-password
  * Generate a password reset token and send reset link
  * (Currently logs to console; can integrate email service later)
  */
 const forgotPassword = async (req, res) => {
+    console.log('[ForgotPassword] Request received:', req.body); // DEBUG: Log incoming request
+
     const { email } = req.body;
 
     // Validate email
     if (!email) {
+        console.log('[ForgotPassword] Missing email'); // DEBUG
         return res.status(400).json({ message: 'Email is required.' });
     }
 

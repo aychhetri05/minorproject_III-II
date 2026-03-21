@@ -7,9 +7,10 @@ require('dotenv').config();
  * Insert a notification into DB and optionally send email if SMTP configured
  * @param {number} userId
  * @param {string} message
+ * @param {string} type - 'match', 'reminder', 'police_suggestion', 'police_action', 'system'
  */
-const createNotification = async (userId, message) => {
-    await db.query('INSERT INTO notifications (user_id, message) VALUES (?, ?)', [userId, message]);
+const createNotification = async (userId, message, type = 'system') => {
+    await db.query('INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)', [userId, message, type]);
 
     // If SMTP configured and nodemailer available, attempt to send an email copy
     if (nodemailer && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {

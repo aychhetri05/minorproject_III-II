@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const policeRoutes = require('./routes/policeRoutes');
 const { authMiddleware, adminMiddleware, policeOrAdminMiddleware } = require('./middleware/auth');
+const { startScheduler } = require('./services/schedulerService');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ---- Routes ----
 app.use('/api', authRoutes);        // /api/register, /api/login
+app.use('/api/users', authMiddleware, require('./routes/userRoutes')); // /api/users/profile
 app.use('/api/items', itemRoutes);  // /api/items, /api/items/open, etc.
 
 // Admin-only routes (protected)
@@ -59,7 +61,32 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
+
+    // Start scheduled tasks (reminders, etc.)
+    startScheduler();
+});
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`⚠️ Port ${PORT} is already in use. Trying fallback port 5001...`);
+        const fallbackPort = 5001;
+
+        if (PORT !== fallbackPort) {
+            app.listen(fallbackPort, () => {
+                console.log(`🚀 Server running at http://localhost:${fallbackPort}`);
+                startScheduler();
+            }).on('error', (fallbackErr) => {
+                if (fallbackErr.code === 'EADDRINUSE') {
+                    console.error(`⚠️ Fallback port ${fallbackPort} is also in use. Please stop the occupying process and retry.`);
+                } else {
+                    console.error('Server fallback error:', fallbackErr);
+                }
+            });
+        }
+    } else {
+        console.error('Server error:', err);
+    }
 });
 

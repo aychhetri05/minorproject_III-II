@@ -59,7 +59,10 @@ const AdminPanel = () => {
                         { label: 'Lost Items',    value: stats.lost,         color: 'danger',    icon: '🔍' },
                         { label: 'Found Items',   value: stats.found,        color: 'info',      icon: '📦' },
                         { label: 'Open',          value: stats.open,         color: 'success',   icon: '🟢' },
-                        { label: 'Matched',       value: stats.matched,      color: 'warning',   icon: '🔗' },
+                        { label: 'Reported',      value: stats.reported,     color: 'info',      icon: '📝' },
+                        { label: 'Pending Physical', value: stats.pending_physical, color: 'warning', icon: '⏳' },
+                        { label: 'Physically Verified', value: stats.physically_verified, color: 'primary', icon: '🚔' },
+                        { label: 'Matched',       value: stats.matched,      color: 'dark',      icon: '🔗' },
                         { label: 'Resolved',      value: stats.resolved,     color: 'secondary', icon: '✔️' },
                         { label: 'AI Matches',    value: stats.totalMatches, color: 'purple',    icon: '🤖' },
                     ].map(s => (
@@ -164,6 +167,7 @@ const AdminPanel = () => {
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Reporter</th>
+                                    <th>Phone</th>
                                     <th>Date</th>
                                     <th>Action</th>
                                 </tr>
@@ -181,22 +185,30 @@ const AdminPanel = () => {
                                         <td>
                                             <span className={`badge bg-${
                                                 item.status === 'open' ? 'success'
-                                                : item.status === 'matched' ? 'warning'
+                                                : item.status === 'reported' ? 'info'
+                                                : item.status === 'pending_physical' ? 'warning'
+                                                : item.status === 'physically_verified' ? 'primary'
+                                                : item.status === 'matched' ? 'secondary'
+                                                : item.status === 'resolved' ? 'dark'
                                                 : 'secondary'
                                             }`}>
                                                 {item.status}
                                             </span>
                                         </td>
                                         <td>{item.reporter_name}</td>
+                                        <td>{item.reporter_phone || '-'}</td>
                                         <td>{new Date(item.created_at).toLocaleDateString()}</td>
                                         <td>
                                             <select
                                                 className="form-select form-select-sm"
                                                 value={item.status}
                                                 onChange={e => handleStatusChange(item.id, e.target.value)}
-                                                style={{ width: 110 }}
+                                                style={{ width: 140 }}
                                             >
                                                 <option value="open">Open</option>
+                                                <option value="reported">Reported</option>
+                                                <option value="pending_physical">Pending Physical</option>
+                                                <option value="physically_verified">Physically Verified</option>
                                                 <option value="matched">Matched</option>
                                                 <option value="resolved">Resolved</option>
                                             </select>
