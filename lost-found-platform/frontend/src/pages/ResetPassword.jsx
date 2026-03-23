@@ -68,7 +68,7 @@ const ResetPassword = () => {
                 <div className="card shadow">
                     <div className="card-body p-4">
                         <div className="text-center mb-4">
-                            <h2 className="fw-bold text-primary">🔐 Reset Password</h2>
+                            <h2 className="fw-bold text-primary"> Reset Password</h2>
                             <p className="text-muted">Create a new password for your account</p>
                         </div>
 

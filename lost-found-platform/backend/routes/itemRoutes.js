@@ -12,7 +12,8 @@ const {
     getAllMatches,
     updateItemStatus,
     getStats,
-    submitPhysical
+    submitPhysical,
+    deleteItem
 } = require('../controllers/itemController');
 
 // ---- Multer configuration for image uploads ----
@@ -48,6 +49,7 @@ router.post('/', authMiddleware, upload.single('image'), createItem); // POST /a
 
 // Submit found item physically to police (authenticated found user)
 router.post('/:id/submit-physical', authMiddleware, submitPhysical);
+router.delete('/:id', authMiddleware, deleteItem);
 
 // ---- Admin / Police routes ----
 router.get('/admin/matches',          authMiddleware, adminMiddleware, getAllMatches);

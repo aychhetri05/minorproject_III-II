@@ -9,7 +9,7 @@ const Home = () => {
             {/* Hero */}
             <div className="bg-primary text-white py-5">
                 <div className="container text-center py-3">
-                    <h1 className="display-5 fw-bold">🇳🇵 Nepal Lost & Found</h1>
+                    <h1 className="display-5 fw-bold"> Nepal Lost & Found</h1>
                     <p className="lead mb-4">
                         Centralized Lost and Recovery Platform with Nepal Police Integration.<br />
                         AI-powered matching to reunite people with their belongings.

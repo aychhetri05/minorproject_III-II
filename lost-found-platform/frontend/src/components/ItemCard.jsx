@@ -27,12 +27,19 @@ const TYPE_COLORS = {
     found: 'info'
 };
 
-const ItemCard = ({ item }) => {
+const ItemCard = ({ item, onDelete }) => {
     const imageUrl = item.image_path
         ? `http://localhost:5000${item.image_path}`
         : null;
 
     const statusLabel = item.status.replace(/_/g, ' ');
+
+    const confirmAndDelete = () => {
+        if (!onDelete) return;
+        if (window.confirm('Are you sure you want to delete this item?')) {
+            onDelete(item.id);
+        }
+    };
 
     return (
         <div className="card h-100 shadow-sm">
@@ -81,9 +88,19 @@ const ItemCard = ({ item }) => {
                     By {item.reporter_name || 'Unknown'}<br />
                     {new Date(item.created_at).toLocaleDateString()}
                 </small>
-                <Link to={`/items/${item.id}`} className="btn btn-sm btn-outline-primary">
-                    View
-                </Link>
+                <div className="d-flex gap-2">
+                    <Link to={`/items/${item.id}`} className="btn btn-sm btn-outline-primary">
+                        View
+                    </Link>
+                    {onDelete && (
+                        <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={confirmAndDelete}
+                        >
+                            Delete
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

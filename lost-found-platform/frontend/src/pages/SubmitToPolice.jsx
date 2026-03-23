@@ -44,7 +44,7 @@ const SubmitToPolice = () => {
 
     return (
         <div className="container py-4" style={{ maxWidth: 720 }}>
-            <h4 className="mb-3">🚔 Submit Found Item to Police</h4>
+            <h4 className="mb-3">Submit Found Item to Police</h4>
             {error && <div className="alert alert-danger">{error}</div>}
             {!item && !error && <div className="text-center py-5"><div className="spinner-border text-primary" /></div>}
 
@@ -83,10 +83,10 @@ const SubmitToPolice = () => {
                             </div>
 
                             <div className="alert alert-info mb-3">
-                                <div className="mb-2"><strong>📋 English:</strong>
+                                <div className="mb-2"><strong> English:</strong>
                                     <p className="mb-0">To reduce fraud and ensure transparency, please submit the found item to your nearest police station.</p>
                                 </div>
-                                <div className="mt-2"><strong>🇳🇵 नेपाली:</strong>
+                                <div className="mt-2"><strong> नेपाली:</strong>
                                     <p className="mb-0">ठगी न्यूनीकरण र पारदर्शिताका लागि, कृपया भेटिएको सामान नजिकको प्रहरी कार्यालयमा बुझाउनुहोस्।</p>
                                 </div>
                             </div>

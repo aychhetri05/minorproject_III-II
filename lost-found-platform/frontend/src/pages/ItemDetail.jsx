@@ -154,8 +154,8 @@ const ItemDetail = () => {
                                 {item.status === 'physically_verified' && (
                                     <div className="alert alert-success mt-3 mb-0">
                                         <small>
-                                            ✔ <strong>Verified:</strong> Your item has been physically verified by police, 
-                                            increasing trust and reducing fraud risk.
+                                            ✔ <strong>Verified:</strong> Your item has been physically verified by police. 
+                        
                                         </small>
                                     </div>
                                 )}

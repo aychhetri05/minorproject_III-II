@@ -1,13 +1,32 @@
 // src/pages/Dashboard.jsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllItems } from '../services/api';
+import { getAllItems, deleteItem } from '../services/api';
 import ItemCard from '../components/ItemCard';
 
 const Dashboard = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const [items, setItems]   = useState([]);
     const [loading, setLoading] = useState(true);
+    const [msg, setMsg] = useState('');
+
+    const handleDelete = async (id) => {
+        try {
+            await deleteItem(id);
+            setItems(prev => prev.filter(item => item.id !== id));
+            setMsg('✅ Item deleted successfully.');
+            setTimeout(() => setMsg(''), 3000);
+        } catch (err) {
+            if (err.response?.status === 403) {
+                setMsg('❌ You are not authorized to delete this item.');
+            } else if (err.response?.status === 404) {
+                setMsg('❌ Item not found.');
+            } else {
+                setMsg('❌ Delete failed.');
+            }
+            setTimeout(() => setMsg(''), 3000);
+        }
+    };
 
     useEffect(() => {
         getAllItems()
@@ -59,6 +78,8 @@ const Dashboard = () => {
                 ))}
             </div>
 
+            {msg && <div className="alert alert-info py-2">{msg}</div>}
+
             {/* Items list */}
             {loading ? (
                 <div className="text-center py-5">
@@ -73,7 +94,7 @@ const Dashboard = () => {
                 <div className="row g-3">
                     {items.map(item => (
                         <div className="col-sm-6 col-lg-4" key={item.id}>
-                            <ItemCard item={item} />
+                            <ItemCard item={item} onDelete={handleDelete} />
                         </div>
                     ))}
                 </div>

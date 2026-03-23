@@ -44,6 +44,7 @@ export const getAllItems   = ()      => api.get('/items');
 export const getOpenItems  = ()      => api.get('/items/open');
 export const getItemById   = (id)    => api.get(`/items/${id}`);
 export const createItem    = (data)  => api.post('/items', data); // FormData for image upload
+export const deleteItem    = (id)    => api.delete(`/items/${id}`);
 
 // ---- Admin ----
 export const getAdminStats   = ()       => api.get('/admin/stats');

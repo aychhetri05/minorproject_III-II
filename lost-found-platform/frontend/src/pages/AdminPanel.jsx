@@ -1,6 +1,6 @@
 // src/pages/AdminPanel.jsx
 import { useEffect, useState } from 'react';
-import { getAdminStats, getAdminMatches, getAllItems, updateStatus } from '../services/api';
+import { getAdminStats, getAdminMatches, getAllItems, updateStatus, deleteItem } from '../services/api';
 
 const AdminPanel = () => {
     const [stats, setStats]     = useState(null);
@@ -38,6 +38,21 @@ const AdminPanel = () => {
             setTimeout(() => setMsg(''), 3000);
         } catch {
             setMsg('❌ Failed to update status.');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this item?')) return;
+        try {
+            await deleteItem(id);
+            setMsg(`✅ Item #${id} deleted successfully.`);
+            fetchData();
+            setTimeout(() => setMsg(''), 3000);
+        } catch (err) {
+            if (err.response?.status === 403) setMsg('❌ Unauthorized to delete this item.');
+            else if (err.response?.status === 404) setMsg('❌ Item not found.');
+            else setMsg('❌ Failed to delete item.');
+            setTimeout(() => setMsg(''), 3000);
         }
     };
 
@@ -198,7 +213,7 @@ const AdminPanel = () => {
                                         <td>{item.reporter_name}</td>
                                         <td>{item.reporter_phone || '-'}</td>
                                         <td>{new Date(item.created_at).toLocaleDateString()}</td>
-                                        <td>
+                                        <td className="d-flex gap-1 align-items-center">
                                             <select
                                                 className="form-select form-select-sm"
                                                 value={item.status}
@@ -212,6 +227,13 @@ const AdminPanel = () => {
                                                 <option value="matched">Matched</option>
                                                 <option value="resolved">Resolved</option>
                                             </select>
+                                            <button
+                                                className="btn btn-sm btn-danger"
+                                                onClick={() => handleDelete(item.id)}
+                                                title="Delete item"
+                                            >
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

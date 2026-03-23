@@ -268,4 +268,46 @@ const getStats = async (req, res) => {
     }
 };
 
-module.exports = { createItem, getAllItems, getOpenItems, getItemById, getAllMatches, updateItemStatus, getStats, submitPhysical };
+/**
+ * DELETE /api/items/:id
+ * - user: delete own item
+ * - admin/police: delete any item
+ * - does not touch blockchain records (no blockchain table in this project)
+ */
+const deleteItem = async (req, res) => {
+    const itemId = Number(req.params.id);
+    if (!itemId || isNaN(itemId) || itemId <= 0) {
+        return res.status(400).json({ message: 'Invalid item ID.' });
+    }
+
+    try {
+        const [items] = await db.query('SELECT * FROM items WHERE id = ?', [itemId]);
+        if (items.length === 0) {
+            return res.status(404).json({ message: 'Item not found.' });
+        }
+
+        const item = items[0];
+        const user = req.user;
+
+        if (!user || !user.role) {
+            return res.status(403).json({ message: 'Unauthorized.' });
+        }
+
+        if (user.role === 'user' && item.user_id !== user.id) {
+            return res.status(403).json({ message: 'Users can only delete their own items.' });
+        }
+
+        if (!['user', 'admin', 'police'].includes(user.role)) {
+            return res.status(403).json({ message: 'Unauthorized role.' });
+        }
+
+        await db.query('DELETE FROM items WHERE id = ?', [itemId]);
+
+        return res.status(200).json({ message: 'Item deleted successfully.' });
+    } catch (err) {
+        console.error('[DeleteItem]', err.message);
+        return res.status(500).json({ message: 'Server error.' });
+    }
+};
+
+module.exports = { createItem, getAllItems, getOpenItems, getItemById, getAllMatches, updateItemStatus, getStats, submitPhysical, deleteItem };

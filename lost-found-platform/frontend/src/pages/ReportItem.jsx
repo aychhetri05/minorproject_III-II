@@ -208,8 +208,8 @@ const ReportItem = () => {
             )}
 
             <div className="alert alert-info mt-3">
-                <strong>🤖 AI Matching:</strong> Once submitted, our system will automatically compare your
-                report against existing open items using NLP similarity scoring.
+                <strong>AI Matching:</strong> Once submitted, our system will automatically compare your
+                report against existing open listed items.
                 You'll see a "matched" status if a match is found.
             </div>
         </div>

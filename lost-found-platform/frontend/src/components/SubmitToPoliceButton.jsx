@@ -106,20 +106,20 @@ const SubmitToPoliceButton = ({ itemId, onSubmitted, itemStatus, autoOpen = fals
                                     </div>
                                     <div className="alert alert-info mb-0">
                                         <div className="mb-2">
-                                            <strong>📋 English:</strong>
+                                            <strong>English:</strong>
                                             <p className="mb-2">
                                                 To reduce fraud and ensure transparency, please submit the found item to your nearest police station.
                                             </p>
                                         </div>
                                         <div className="mb-2">
-                                            <strong>🇳🇵 नेपाली:</strong>
+                                            <strong>नेपाली:</strong>
                                             <p className="mb-2">
                                                 ठगी न्यूनीकरण र पारदर्शिताका लागि, कृपया भेटिएको सामान नजिकको प्रहरी कार्यालयमा बुझाउनुहोस्।
                                             </p>
                                         </div>
                                         <small className="text-muted">
-                                            After submitting, police/admin will verify the physical item and mark it as "Physically Verified". 
-                                            You'll receive a notification when verification is complete.
+                                            After submitting, police/admin will verify the physical item and mark "Physically Verified". 
+                                            You'll receive a notification when matched is found.
                                         </small>
                                     </div>
                                 </div>
